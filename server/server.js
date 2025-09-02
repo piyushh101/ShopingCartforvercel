@@ -335,6 +335,24 @@ app.post("/api/payment/verify", async (req, res) => {
 
 
 const PORT = process.env.PORT || 5174;
-app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
-});
+// CORS setup
+const allowedOrigins = [
+  "http://localhost:5173",          // local dev (Vite)
+  "https://bookkaroo.netlify.app"   // production (Netlify)
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (like curl, Postman)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
